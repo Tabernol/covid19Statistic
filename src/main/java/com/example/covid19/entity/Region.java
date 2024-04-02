@@ -1,6 +1,21 @@
 package com.example.covid19.entity;
 
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public record Region(@Id String iso, String name) {
+@Entity
+@Table(name = "regions")
+@Getter
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+public class Region {
+    @Id
+    private String iso;
+    private String name;
+
 }

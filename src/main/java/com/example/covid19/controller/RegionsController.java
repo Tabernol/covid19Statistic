@@ -1,5 +1,7 @@
 package com.example.covid19.controller;
 
+import com.example.covid19.service.RegionService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.DefaultAsyncHttpClient;
@@ -10,7 +12,11 @@ import java.io.IOException;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class RegionsController {
+
+    private final RegionService regionService;
+
     @GetMapping("/regions")
     public void getRegions() throws IOException {
         log.info("go to regions");
@@ -25,7 +31,19 @@ public class RegionsController {
                 .setHeader("X-RapidAPI-Host", "covid-19-statistics.p.rapidapi.com")
                 .execute()
                 .toCompletableFuture()
-                .thenAccept(System.out::println)
+                .thenAccept(response -> {
+                    try {
+                        if (response.getStatusCode() == 200) {
+                            String responseBody = response.getResponseBody();
+                            log.info(responseBody);
+                            regionService.saveAll(responseBody);
+                        } else {
+                            log.warn("Request failed with status code: " + response.getStatusCode());
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                })
                 .join();
 
         client.close();
