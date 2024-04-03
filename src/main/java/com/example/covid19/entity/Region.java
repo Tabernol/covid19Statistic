@@ -1,6 +1,5 @@
 package com.example.covid19.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -17,5 +16,4 @@ public class Region {
     @Id
     private String iso;
     private String name;
-
 }
