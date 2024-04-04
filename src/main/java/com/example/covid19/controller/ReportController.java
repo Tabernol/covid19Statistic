@@ -26,25 +26,36 @@ public class ReportController {
 
     private final CountryReportService countryReportService;
 
-    @GetMapping("/{iso}")
-    private CompletableFuture<List<Report>> getResponse(@PathVariable("iso") String iso) throws ReportException {
-        if (countryReportService.isExist(iso)) {
-            log.info("The data is already stored locally");
-            return CompletableFuture.completedFuture(countryReportService.getByIso(iso).getReportList());
-        } else {
+    @GetMapping()
+    private CompletableFuture<List<Report>> getResponse(
+            @RequestParam(value = "iso", required = false) String iso,
+            @RequestParam(value = "date", required = false) String date)
+            throws ReportException {
+        log.info("date " + date);
+        log.info("iso " + iso);
+//        if (countryReportService.isExist(iso)) {
+//            log.info("The data is already stored locally");
+//            return CompletableFuture.completedFuture(countryReportService.getByIso(iso).getReportList());
+//        } else {
             log.info("Cal to server to obtain data");
-            return callToRemoteServer(iso);
-        }
+            return callToRemoteServer(iso, date);
+//        }
     }
 
 
-    private CompletableFuture<List<Report>> callToRemoteServer(String iso) {
+    private CompletableFuture<List<Report>> callToRemoteServer(String iso, String date) {
         log.info("call get report " + iso);
         AsyncHttpClient client = new DefaultAsyncHttpClient();
-        String baseUrl = "https://covid-19-statistics.p.rapidapi.com/reports?iso=";
-        String currentUrl = baseUrl + iso;
+        String baseUrl = "https://covid-19-statistics.p.rapidapi.com/reports";
+        if (iso != null && !iso.isEmpty()){
+            baseUrl += "?iso="+ iso;
+        }
+        if (date != null && !date.isEmpty()) {
+            baseUrl += "&date=" + date;
+        }
 
-        return client.prepare("GET", currentUrl)
+
+        return client.prepare("GET", baseUrl)
                 .setHeader("X-RapidAPI-Key", "4919255501mshe2ac11ca4846c23p1249e1jsn9b6fcd256ce3")
                 .setHeader("X-RapidAPI-Host", "covid-19-statistics.p.rapidapi.com")
                 .execute()
